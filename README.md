@@ -4,7 +4,8 @@
 
 ## 效果图
 
- <img src="docs/images/view-1.png" width="400" alt="效果图 1" />  <img src="docs/images/view-2.png" width="400" alt="效果图 2" /> 
+ <img src="docs/images/view-1.png" width="400" alt="效果图 1" /> 
+ <img src="docs/images/view-2.png" width="400" alt="效果图 2" /> 
 
 卡片长这样:
 
@@ -18,7 +19,7 @@
 
 你不会装也没关系。**把本仓库地址发给你的 DSH 智能体**,对它说一句:
 
-> 帮我把这个插件装到我的 DSH 里:[<仓库地址>](https://github.com/Jolly-J/dsh-deepseek-billing)
+> 帮我把这个插件装到我的 DSH 里:https://github.com/Jolly-J/dsh-deepseek-billing
 
 你的智能体照着下面 6 步做完,重启 `dsh web` 就好了:
 
