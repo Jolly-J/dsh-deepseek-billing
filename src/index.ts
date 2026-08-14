@@ -11,7 +11,6 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-host-webserver'
-import { credentialRef } from '@deepseek-ai/dsh-credentials'
 
 /** Stable Cordis plugin name. */
 export const name = 'ui-deepseek-billing'
@@ -303,7 +302,7 @@ export function apply(ctx: Context): void {
         let apiKey: string | null = null
         if (credentials !== undefined) {
           try {
-            const hit = await credentials.resolve(credentialRef(apiKeyEnv))
+            const hit = await credentials.resolve(apiKeyEnv)
             if (hit !== undefined && hit.value.length > 0) apiKey = hit.value
           } catch (error) {
             /* resolution failure reads as unconfigured */
