@@ -4,8 +4,7 @@
 
 ## 效果图
 
-| --- | --- |
-| <img src="docs/images/view-1.png" width="400" alt="效果图 1" /> | <img src="docs/images/view-2.png" width="400" alt="效果图 2" /> |
+ <img src="docs/images/view-1.png" width="400" alt="效果图 1" />  <img src="docs/images/view-2.png" width="400" alt="效果图 2" /> 
 
 卡片长这样:
 
