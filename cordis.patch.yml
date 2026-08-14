@@ -1,0 +1,7 @@
+# Bundle patch applied over the selected DSH profile when this package is
+# installed via `dsh plugin add` (declared by the dsh.bundle manifest).
+# The row id is deployment-local; the package name must match package.json.
+
+- insert:
+    - id: ui-deepseek-billing
+      name: 'dsh-deepseek-billing'
