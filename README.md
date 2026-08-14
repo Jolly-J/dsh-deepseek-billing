@@ -4,8 +4,9 @@
 
 ## 效果图
 
- <img src="docs/images/view-1.png" width="400" alt="效果图 1" /> 
- <img src="docs/images/view-2.png" width="400" alt="效果图 2" /> 
+| 图 1 | 图 2 |
+| --- | --- |
+| <img src="docs/images/view-1.png" width="400" alt="效果图 1" /> | <img src="docs/images/view-2.png" width="400" alt="效果图 2" /> |
 
 卡片长这样:
 
@@ -15,11 +16,21 @@
 - 侧边栏收起(窄栏)时自动隐藏,不挡东西;
 - 每 60 秒自动刷新一次。
 
-## 安装(推荐:让 AI 帮你装)
+## 安装
+
+### 方式一(最简):一条命令
+
+```sh
+dsh plugin --profile web add https://github.com/Jolly-J/dsh-deepseek-billing.git
+```
+
+装完重启 `dsh web` 即可(插件会自动作为 profile 层加入组合)。
+
+### 方式二:让 AI 帮你装
 
 你不会装也没关系。**把本仓库地址发给你的 DSH 智能体**,对它说一句:
 
-> 帮我把这个插件装到我的 DSH 里:https://github.com/Jolly-J/dsh-deepseek-billing
+> 帮我把这个插件装到我的 DSH 里:<仓库地址>
 
 你的智能体照着下面 6 步做完,重启 `dsh web` 就好了:
 
