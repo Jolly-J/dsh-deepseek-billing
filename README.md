@@ -1,76 +1,67 @@
 # dsh-deepseek-billing
 
-DSH **WebUI 插件**:侧边栏 DeepSeek 账户余额显示 + 按会话费用估算。
+给 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)(DSH)网页版装一个**余额小卡片**:在左侧边栏底部实时显示你的 DeepSeek **账户余额**,以及**当前会话花了多少钱**。
 
-> 这是一个面向 DSH Web UI 的界面插件(不是 agent 工具插件)。安装后会在 DSH Web 界面的左侧边栏底部、设置按钮上方出现一张悬浮卡片。
+## 效果图
 
-## 功能
+| 图 1 | 图 2 |
+| --- | --- |
+| <img src="docs/images/view-1.png" width="400" alt="效果图 1" /> | <img src="docs/images/view-2.png" width="400" alt="效果图 2" /> |
 
-- **摘要行**:状态点 · `余额:¥xx.xx元`(左)· `会话:¥x.xxx`(右)· 刷新按钮 · 展开箭头;
-- **展开详情**:充值 / 赠送余额、输入 / 缓存命中 / 输出 token、会话费用估算、计价档位说明与更新时间;
-- 点击摘要行展开/收起,点击卡片外部自动收起,数字滚动过渡,切换会话自动切换对应会话的消耗;
-- 窄栏(侧边栏收起)状态不渲染,不干扰布局;
-- 每 60 秒自动刷新,数据获取耗时显示在卡片底部。
+卡片长这样:
 
-## 数据来源与计价
+- **一行摘要**:绿点状态 · `余额:¥xx.xx元` · `会话:¥x.xxx` · 刷新按钮 · 箭头;
+- **点一下展开**:显示充值/赠送余额、输入/输出 token、缓存命中率、本会话费用;
+- 点卡片外面自动收起;数字变化时是滚动动画;切换会话自动跟着变;
+- 侧边栏收起(窄栏)时自动隐藏,不挡东西;
+- 每 60 秒自动刷新一次。
 
-- **余额**:官方 `GET {baseURL}/user/balance` 接口,复用模型路由的同一把 API Key,30 秒缓存;
-- **用量**:直接遍历 DSH 会话日志中模型调用的 usage 记录(优先内存事件,冷会话回落持久化日志);
-- **计价**:内置 DeepSeek 官方价格表(V4-Flash / V4-Pro,缓存命中 / 未命中 / 输出),按每条消息的时间戳自动套用 2026-08-17 起生效的峰谷定价与旧价表;
-- 输入口径与 DSH 统计行一致:计费输入 = 未缓存 + 缓存命中 + 缓存写入。
+## 安装(推荐:让 AI 帮你装)
 
-## 安装(推荐:让 DSH 智能体帮你装)
+你不会装也没关系。**把本仓库地址发给你的 DSH 智能体**,对它说一句:
 
-本插件按 DSH 官方教程的包形态组织,可以作为一个包直接放入 DSH 仓库。最简单的安装方式是**把本仓库地址发给你的 DSH 智能体**,对它说:
+> 帮我把这个插件装到我的 DSH 里:<仓库地址>
 
-> 把这个插件装到我的 DSH 里:https://github.com/<你的用户名>/dsh-deepseek-billing
+你的智能体照着下面 6 步做完,重启 `dsh web` 就好了:
 
-智能体需要完成(以下清单也写入了仓库结构,agent 可以直接照做):
-
-1. 将本仓库克隆/复制到 DSH 仓库的 `packages/extensions/dsh-deepseek-billing`;
-2. 在 `packages/bundle/web-app/cordis.patch.yml` 的 browser roster 区加入:
-
-```yaml
-- id: ui-deepseek-billing
-  name: 'dsh-deepseek-billing'
-```
-
-3. 在 `packages/bundle/web-app/package.json` 的 `dependencies` 中加入:
-
-```json
-"dsh-deepseek-billing": "workspace:^"
-```
-
-4. 在根 `tsconfig.client.json` 的 `references` 中加入 `{ "path": "./packages/extensions/dsh-deepseek-billing" }`;
-5. 执行 `pnpm install`,再构建本包:`pnpm --filter dsh-deepseek-billing bundle`;
+1. 把本仓库放到 DSH 项目的 `packages/extensions/dsh-deepseek-billing`;
+2. 在 `packages/bundle/web-app/cordis.patch.yml` 里加一行:
+   ```yaml
+   - id: ui-deepseek-billing
+     name: 'dsh-deepseek-billing'
+   ```
+3. 在 `packages/bundle/web-app/package.json` 的 `dependencies` 里加:
+   ```json
+   "dsh-deepseek-billing": "workspace:^"
+   ```
+4. 在根目录 `tsconfig.client.json` 的 `references` 里加 `{ "path": "./packages/extensions/dsh-deepseek-billing" }`;
+5. 运行 `pnpm install`,然后构建:`pnpm --filter dsh-deepseek-billing bundle`;
 6. 重启 `dsh web`。
 
-### 手动安装
+> 要求:DSH 项目本身能正常构建,`pnpm` 版本 11.7.0(和 DSH 的 `packageManager` 一致)。
 
-与上面清单相同,自己完成 1–6 步即可。注意:`pnpm` 版本要求 11.7.0(与 DSH 仓库的 `packageManager` 一致)。
+## 数据从哪来
 
-## 密钥与安全说明(必读)
+- **余额**:直接调用 DeepSeek 官方余额接口,用的就是你模型正在用的**同一把 API Key**,不用另外配置;
+- **花了多少钱**:读取 DSH 自己记录的每次模型调用用量,按 DeepSeek **官方价格表**计算(含缓存命中和 2026-08-17 起的峰谷价),本会话累计。
 
-本插件**不读取、不存储你的 API Key**,但它需要密钥才能调用官方余额接口,因此请了解以下事实:
+## 密钥安全(重要,请花一分钟读)
 
-1. **密钥从哪来**:插件通过 DSH 的 `credentials` 服务解析与模型路由**同一把** `DEEPSEEK_API_KEY`(或你在 `llm-deepseek` 设置段自定义的 `apiKeyEnv`)。插件自己没有独立的密钥配置。
-2. **明文密钥的轨迹**:解析出的密钥明文只短暂存在于插件所在进程的内存中,并以**环境变量**的形式传给一次 `curl` 子进程,仅用于向 DeepSeek 官方余额接口发送 `Authorization` 请求头。插件**不会**:
-   - 把密钥写入磁盘、日志或任何缓存(缓存的只有余额数字);
-   - 把密钥放进命令行参数(因此 `ps` 等工具无法从 argv 看到它);
-   - 把密钥返回给浏览器或 `/billing/status` 接口(该接口只返回余额数字与 token 用量);
-   - 把密钥发送到除配置的 DeepSeek 端点以外的任何地址。
-3. **已知暴露面**(任何使用这把密钥的程序都存在的通用风险):
-   - 同一台机器上、具有相同用户权限的进程可以读取 curl 子进程的环境变量,从而获得密钥明文——这是操作系统层面的通用事实,不是本插件特有的缺陷;
-   - 局域网内能访问 DSH web 端口的调用者可以请求 `/billing/status`,得知你的**账户余额数字**(密钥本身不会暴露)。如需收紧,请在部署层面对该路径加访问控制。
-4. **开源安全**:本仓库中不包含任何硬编码密钥,代码里只有环境变量**名字**字符串 `DEEPSEEK_API_KEY`。
+插件**不存、不偷、不外传你的 API Key**:
+
+- 它只是向 DSH 要"模型正在用的那把钥匙"(`DEEPSEEK_API_KEY`),临时拿来调一次官方余额接口,用完即弃;
+- 密钥只短暂出现在本机插件进程内存里(以环境变量方式传给一次 `curl`,不出现在命令行参数中);
+- **不会**写进磁盘/日志/缓存,**不会**出现在网页接口返回里,**不会**发给 DeepSeek 以外的地方;
+- 仓库代码里没有任何密钥,只有环境变量的**名字** `DEEPSEEK_API_KEY`。
+
+已知的两个通用风险(不是本插件独有):同机器的同权限进程理论上能读到 curl 进程的环境变量;局域网里能访问你 DSH 网页端口的人可以看到你的**余额数字**(看不到密钥)。介意的话请在部署层给 `/billing/status` 加访问限制。
 
 ## 已知限制
 
-- 余额接口为局域网可见(只暴露余额数字,不暴露密钥);
-- 价格表内置于代码,官方调价需更新插件版本(官方无价格 API);
-- 费用仅统计当前会话,子代理会话未汇总;
-- 文案目前为中文,尚未接入 i18n。
+- 费用只算**当前会话**,子代理会话暂未汇总;
+- 价格表内置在代码里,官方调价后需要更新插件版本(官方没有价格查询接口);
+- 文案目前是中文。
 
 ## License
 
-MIT
+[MIT](LICENSE)
