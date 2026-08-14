@@ -1,1 +1,0 @@
-{"version":3,"file":"BillingPanel.d.ts","sourceRoot":"","sources":["../../../src/client/BillingPanel.tsx"],"names":[],"mappings":"AAAA;;;;;GAKG;AAEH,OAAO,EAA+B,KAAK,SAAS,EAAE,MAAM,OAAO,CAAA;AACnE,OAAO,KAAK,EAAE,YAAY,EAAE,MAAM,kCAAkC,CAAA;AAsDpE,KAAK,KAAK,GAAG,YAAY,CAAC,uBAAuB,CAAC,CAAA;AA8GlD,mEAAmE;AACnE,wBAAgB,YAAY,CAAC,EAAE,IAAI,EAAE,WAAW,EAAE,EAAE,KAAK,GAAG,SAAS,CAqNpE"}
