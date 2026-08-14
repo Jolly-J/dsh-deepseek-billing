@@ -24,7 +24,7 @@
 dsh plugin --profile web add https://github.com/Jolly-J/dsh-deepseek-billing.git
 ```
 
-装完重启 `dsh web` 即可(插件会自动作为 profile 层加入组合)。
+装完重启 `dsh web` 即可(插件会自动作为 profile 层加入组合;`lib/` 产物已随仓库提交,无需本地构建)。
 
 ### 方式二:让 AI 帮你装
 
