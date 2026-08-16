@@ -6,7 +6,9 @@
 
 ## 效果图
 
-| 图 1 | 图 2 |
+<img src="docs/images/hero.png" width="720" alt="DSH 余额卡片 封面图" />
+
+| 实际页面截图 1 | 实际页面截图 2 |
 | --- | --- |
 | <img src="docs/images/market-1.jpg" width="400" alt="实际页面截图 1" /> | <img src="docs/images/market-2.jpg" width="400" alt="实际页面截图 2" /> |
 
