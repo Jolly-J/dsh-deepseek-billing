@@ -1,8 +1,10 @@
 /**
- * The sidebar-foot billing card: a fixed summary row (status dot, balance,
- * session cost, refresh, expand chevron) with an animated detail body.
- * Numbers roll between old and new values inside fixed-height slots; every
- * other element stays put while only the digits animate.
+ * The sidebar-header billing card: a compact status row (status dot, balance,
+ * session cost, refresh, expand chevron) with an animated in-flow detail body.
+ * Pure flex layout — the card sits under the brand row and never floats over
+ * the workspace region. Numbers roll between old and new values inside
+ * fixed-height slots; every other element stays put while only the digits
+ * animate.
  */
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
@@ -60,9 +62,8 @@ interface LoadState {
   error: string | null
 }
 
-type Props = PropsRuntime<'sidebar.footer.action'>
+type Props = PropsRuntime<'sidebar.header.action'>
 
-const SIDE_MARGIN = 12
 const REFRESH_INTERVAL_MS = 60000
 
 function fmtTokens(v: number): string {
@@ -170,40 +171,13 @@ function AnimatedValue({ text }: { text: string }): ReactNode {
   )
 }
 
-/** Mount the fixed summary row with the expandable detail body. */
+/** Mount the compact status row with the in-flow expandable detail body. */
 export function BillingPanel({ wide, useSessions }: Props): ReactNode {
-  const [expanded, setExpanded] = useState(wide)
+  const [expanded, setExpanded] = useState(false)
   const [status, setStatus] = useState<LoadState | null>(null)
-  const [box, setBox] = useState({ left: SIDE_MARGIN, width: 280 - SIDE_MARGIN * 2 })
-  const anchorRef = useRef<HTMLDivElement | null>(null)
-  const popRef = useRef<HTMLDivElement | null>(null)
 
   const current = useSessions(state => state.current)
   const sessionId = current === undefined || current === null ? null : String(current)
-
-  /** Measure the sidebar column through the component's own ancestor chain. */
-  const measureColumn = (): void => {
-    const anchor = anchorRef.current
-    if (anchor === null) return
-    let n: HTMLElement | null = anchor.parentElement
-    while (n !== null && n.clientWidth === 0) n = n.parentElement
-    if (n === null) return
-    let best = n
-    let lastWidth = n.clientWidth
-    while (n !== null && n.parentElement !== null) {
-      const p: HTMLElement | null = n.parentElement
-      const pw = p.clientWidth
-      if (pw === 0) { n = p; continue }
-      if (pw <= lastWidth + 60) { n = p; best = p; lastWidth = pw; continue }
-      break
-    }
-    const rect = best.getBoundingClientRect()
-    const next = {
-      left: Math.round(rect.left) + SIDE_MARGIN,
-      width: Math.max(0, Math.round(rect.width) - SIDE_MARGIN * 2),
-    }
-    setBox(prev => (prev.left === next.left && prev.width === next.width ? prev : next))
-  }
 
   useEffect(() => {
     if (!wide) return undefined
@@ -221,42 +195,12 @@ export function BillingPanel({ wide, useSessions }: Props): ReactNode {
     // old numbers so AnimatedValue can roll into the new ones.
     setStatus(prev => (prev === null ? { loading: true, data: null, error: null } : prev))
     void refresh()
-    measureColumn()
-    // The sidebar width is transitional during expand/collapse; re-measure
-    // until it settles, then keep it fresh with every refresh.
-    const settle1 = window.setTimeout(() => { measureColumn() }, 300)
-    const settle2 = window.setTimeout(() => { measureColumn() }, 900)
-    const settle3 = window.setTimeout(() => { measureColumn() }, 1800)
-    const interval = window.setInterval(() => { void refresh(); measureColumn() }, REFRESH_INTERVAL_MS)
+    const interval = window.setInterval(() => { void refresh() }, REFRESH_INTERVAL_MS)
     return () => {
       cancelled = true
-      window.clearTimeout(settle1)
-      window.clearTimeout(settle2)
-      window.clearTimeout(settle3)
       window.clearInterval(interval)
     }
   }, [sessionId, wide])
-
-  // Re-expanding the sidebar reopens the detail body by default.
-  useEffect(() => {
-    if (wide) setExpanded(true)
-  }, [wide])
-
-  // Clicking outside the container collapses it.
-  useEffect(() => {
-    if (!wide) return undefined
-    const doc = anchorRef.current?.ownerDocument
-    if (doc === undefined) return undefined
-    const onDocClick = (event: MouseEvent): void => {
-      const target = event.target
-      if (target === null || target === undefined) return
-      const pop = popRef.current
-      if (pop !== null && pop.contains(target as Node)) return
-      setExpanded(false)
-    }
-    doc.addEventListener('click', onDocClick)
-    return () => { doc.removeEventListener('click', onDocClick) }
-  }, [wide])
 
   if (!wide) return null
 
@@ -271,8 +215,6 @@ export function BillingPanel({ wide, useSessions }: Props): ReactNode {
       }
     })()
   }
-
-  const boxStyle = { left: `${box.left}px`, width: `${box.width}px` }
 
   const bodyRows = ((): ReactNode[] => {
     const data = status?.data ?? null
@@ -346,41 +288,39 @@ export function BillingPanel({ wide, useSessions }: Props): ReactNode {
   })()
 
   return (
-    <div className={css.anchor} ref={anchorRef}>
-      <div className={expanded ? `${css.pop} ${css.expanded}` : css.pop} style={boxStyle} ref={popRef}>
-        <div
-          className={css.head}
-          role="button"
-          aria-expanded={expanded}
-          title={(expanded ? '收起 · ' : '展开详情 · ') + '当前会话费用估算(非账单)'}
-          onClick={() => { setExpanded(v => !v) }}
-        >
-          <div className={css.headLeft}>
-            <span className={dotClass(status)} />
-            <span className={css.label}>余额:</span>
-            <span className={css.value}>
-              <AnimatedValue text={balanceShort(status)} />
-            </span>
-          </div>
-          <span className={css.spacer} />
-          <span className={css.label} title="当前会话费用估算(非账单)">会话:</span>
-          <span className={css.valueSlot}>
-            <AnimatedValue text={costShort(status)} />
+    <div className={expanded ? `${css.card} ${css.expanded}` : css.card}>
+      <div
+        className={css.head}
+        role="button"
+        aria-expanded={expanded}
+        title={(expanded ? '收起 · ' : '展开详情 · ') + '当前会话费用估算(非账单)'}
+        onClick={() => { setExpanded(v => !v) }}
+      >
+        <div className={css.headLeft}>
+          <span className={dotClass(status)} />
+          <span className={css.label}>余额:</span>
+          <span className={css.value}>
+            <AnimatedValue text={balanceShort(status)} />
           </span>
-          <button
-            type="button"
-            className={css.iconBtn}
-            title="刷新"
-            onClick={(event) => { event.stopPropagation(); refreshNow() }}
-          >
-            {iconRefresh()}
-          </button>
-          <span className={css.chevron}>{iconChevron()}</span>
         </div>
-        <div className={css.body}>
-          <div className={css.bodyInner}>
-            {bodyRows}
-          </div>
+        <span className={css.spacer} />
+        <span className={css.label} title="当前会话费用估算(非账单)">会话:</span>
+        <span className={css.valueSlot}>
+          <AnimatedValue text={costShort(status)} />
+        </span>
+        <button
+          type="button"
+          className={css.iconBtn}
+          title="刷新"
+          onClick={(event) => { event.stopPropagation(); refreshNow() }}
+        >
+          {iconRefresh()}
+        </button>
+        <span className={css.chevron}>{iconChevron()}</span>
+      </div>
+      <div className={css.body}>
+        <div className={css.bodyInner}>
+          {bodyRows}
         </div>
       </div>
     </div>

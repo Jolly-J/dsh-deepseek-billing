@@ -1,23 +1,15 @@
-.anchor {
-  width: 0;
-  height: 0;
-  flex: none;
-}
-
-.pop {
-  position: fixed;
-  bottom: 128px;
-  z-index: 28;
+.card {
   box-sizing: border-box;
-  max-height: calc(100vh - 152px);
-  overflow: auto;
-  padding: 8px 12px;
+  flex: none;
+  margin: 0 2px 8px;
   border: 1px solid var(--dsw-alias-border-l2, rgba(128, 128, 128, .35));
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--dsw-specific-sidebar-fill, var(--dsw-alias-bg-layer-1, #fff));
   color: var(--dsw-alias-label-primary, currentColor);
   font-size: 12px;
   line-height: 1.55;
+  padding: 6px 12px;
+  overflow: hidden;
 }
 
 .head {
@@ -93,10 +85,13 @@
   flex: none;
   color: var(--dsw-alias-label-secondary, rgba(128, 128, 128, 1));
   transition: transform .28s ease;
+  /* The detail body opens downward, so the collapsed hint points down and
+     the expanded state points up (rotate back to the raw glyph). */
+  transform: rotate(180deg);
 }
 
-.pop.expanded .chevron {
-  transform: rotate(180deg);
+.card.expanded .chevron {
+  transform: rotate(0deg);
 }
 
 .dot {
@@ -122,7 +117,7 @@
   margin-top: 0;
 }
 
-.pop.expanded .body {
+.card.expanded .body {
   grid-template-rows: 1fr;
   margin-top: 8px;
 }
@@ -134,8 +129,10 @@
   transition: opacity .22s ease;
 }
 
-.pop.expanded .bodyInner {
+.card.expanded .bodyInner {
   opacity: 1;
+  max-height: 42vh;
+  overflow-y: auto;
 }
 
 .divider {
