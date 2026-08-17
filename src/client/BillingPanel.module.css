@@ -131,8 +131,21 @@
 
 .card.expanded .bodyInner {
   opacity: 1;
+}
+
+/*
+ * The scroll container is nested inside the animated bodyInner instead of
+ * being the animated element itself. Its height (auto, capped at 42vh) never
+ * tracks the grid-template-rows animation, so when the detail is tall the
+ * vertical scrollbar is present at full width from the first frame and never
+ * appears mid-animation only to vanish at the end. That keeps the detail rows
+ * at a constant width while the card expands/collapses — no scrollbar-induced
+ * layout shift on space-taking scrollbars.
+ */
+.scroll {
   max-height: 42vh;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .divider {

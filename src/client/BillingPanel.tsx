@@ -7,7 +7,7 @@
  * animate.
  */
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import css from './BillingPanel.module.css'
@@ -320,7 +320,9 @@ export function BillingPanel({ wide, useSessions }: Props): ReactNode {
       </div>
       <div className={css.body}>
         <div className={css.bodyInner}>
-          {bodyRows}
+          <div className={css.scroll}>
+            {bodyRows}
+          </div>
         </div>
       </div>
     </div>
