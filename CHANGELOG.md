@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-rc.7 - 2026-08-19
+
+- 余额请求改用宿主原生 `fetch`,弃用 shell + curl,修复 Windows 下 schannel 凭据失败与 API Key 环境变量无法传入子进程的问题(#1)。
+- 非 JSON 与非 2xx 响应给出可读错误信息,不再暴露原始解析异常。
+
 ## 0.1.0-rc.6 - 2026-08-19
 
 - 改用 DSH rc.7 官方 `sidebar.footer.action`,无需修改官方侧边栏 bundle。

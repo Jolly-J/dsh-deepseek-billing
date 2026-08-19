@@ -137,7 +137,7 @@ export function registerBillingStatusRoute(ctx: Context): () => void {
           if (balanceCache !== null && now - balanceCache.atMs < BALANCE_TTL_MS) {
             return { ...balanceCache.value, balanceMs: Date.now() - start }
           }
-          const value = await fetchBalance(ctx, apiKey, apiKeyEnv, baseURL)
+          const value = await fetchBalance(apiKey, apiKeyEnv, baseURL)
           balanceCache = { atMs: now, value }
           return { ...value, balanceMs: Date.now() - start }
         })()

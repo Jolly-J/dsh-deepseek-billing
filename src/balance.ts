@@ -1,25 +1,7 @@
-import type { Context } from '@deepseek-ai/cordis'
 import type { BalanceAttempt, BillingBalance } from './types.ts'
 
-interface ShellOutputLike {
-  text?: string
-}
-
-interface ShellRunLike {
-  exitCode: number | null
-  stdout?: ShellOutputLike | null
-  stderr?: ShellOutputLike | null
-}
-
-interface ShellLike {
-  resolve(request: {
-    command: string
-    env?: Record<string, string>
-    timeoutMs?: number
-    stdoutMaxBytes?: number
-  }): unknown
-  run(spec: unknown): Promise<ShellRunLike>
-}
+const BALANCE_TIMEOUT_MS = 25000
+const MAX_ERROR_BODY = 160
 
 function money(value: unknown): number {
   const parsed = Number(value)
@@ -46,9 +28,17 @@ function parseBalance(text: string): BillingBalance | null {
   }
 }
 
-/** Fetch the DeepSeek account balance without exposing the credential on argv. */
+/**
+ * Fetch the DeepSeek account balance with the host's native fetch.
+ *
+ * Rationale (issue #1): running `curl` through the shell service broke on
+ * Windows twice over — schannel could not acquire client credentials inside
+ * the sandbox, and the credential passed via `env` never reached the bash
+ * subprocess. Native fetch uses Node's own TLS stack on every platform and
+ * keeps the key strictly inside this process: it appears only in the
+ * Authorization header, never in argv, in a child environment, or in logs.
+ */
 export async function fetchBalance(
-  ctx: Context,
   apiKey: string | null,
   apiKeyEnv: string,
   baseURL: string,
@@ -56,29 +46,36 @@ export async function fetchBalance(
   if (apiKey === null) {
     return { keyMissing: true, balance: null, balanceError: `未找到 API Key(${apiKeyEnv})` }
   }
-  const shell = ctx.get('shell') as ShellLike | undefined
-  if (shell === undefined) return { keyMissing: false, balance: null, balanceError: 'shell 服务不可用' }
-
   try {
     const endpoint = baseURL.replace(/\/+$/, '') + '/user/balance'
-    const spec = shell.resolve({
-      command: `curl -sS --max-time 20 -H "Authorization: Bearer $DEEPSEEK_API_KEY" "${endpoint}"`,
-      env: { DEEPSEEK_API_KEY: apiKey },
-      timeoutMs: 25000,
-      stdoutMaxBytes: 65536,
+    const response = await fetch(endpoint, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        Accept: 'application/json',
+      },
+      signal: AbortSignal.timeout(BALANCE_TIMEOUT_MS),
     })
-    const run = await shell.run(spec)
-    const text = typeof run.stdout?.text === 'string' ? run.stdout.text.trim() : ''
-    if (run.exitCode === 0 && text.length > 0) {
+    const text = (await response.text()).trim()
+    if (!response.ok) {
+      const status = `${response.status} ${response.statusText}`.trim()
+      const suffix = text.length > 0 ? ` (${text.slice(0, MAX_ERROR_BODY)})` : ''
+      return { keyMissing: false, balance: null, balanceError: `余额接口请求失败: ${status}${suffix}` }
+    }
+    if (text.length === 0) {
+      return { keyMissing: false, balance: null, balanceError: '余额接口返回空响应' }
+    }
+    try {
       const balance = parseBalance(text)
       return balance === null
         ? { keyMissing: false, balance: null, balanceError: '余额接口未返回 balance_infos' }
         : { keyMissing: false, balance, balanceError: null }
+    } catch {
+      return {
+        keyMissing: false,
+        balance: null,
+        balanceError: `余额接口响应不是有效 JSON: ${text.slice(0, MAX_ERROR_BODY)}`,
+      }
     }
-    const detail = typeof run.stderr?.text === 'string' && run.stderr.text.length > 0
-      ? run.stderr.text.trim()
-      : `exit=${String(run.exitCode)}`
-    return { keyMissing: false, balance: null, balanceError: `请求失败: ${detail}` }
   } catch (error) {
     return { keyMissing: false, balance: null, balanceError: error instanceof Error ? error.message : String(error) }
   }

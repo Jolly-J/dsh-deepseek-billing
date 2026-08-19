@@ -1,7 +1,7 @@
 {
   "name": "dsh-deepseek-billing",
   "description": "DSH WebUI 插件:侧边栏 DeepSeek 账户余额显示与按会话费用估算",
-  "version": "0.1.0-rc.6",
+  "version": "0.1.0-rc.7",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
