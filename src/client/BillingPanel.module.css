@@ -88,13 +88,14 @@
   flex: none;
   color: var(--dsw-alias-label-secondary, rgba(128, 128, 128, 1));
   transition: transform .28s ease;
-  /* The detail body opens downward, so the collapsed hint points down and
-     the expanded state points up (rotate back to the raw glyph). */
-  transform: rotate(180deg);
+  /* The card sits at the sidebar bottom and the detail body opens upward,
+     so the collapsed hint points up and the expanded state points down
+     (rotate back to the raw up glyph). */
+  transform: rotate(0deg);
 }
 
 .card.expanded .chevron {
-  transform: rotate(0deg);
+  transform: rotate(180deg);
 }
 
 .dot {
