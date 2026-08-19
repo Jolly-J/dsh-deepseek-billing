@@ -1,6 +1,9 @@
 .card {
   box-sizing: border-box;
   flex: none;
+  width: calc(100% - 4px);
+  min-width: 0;
+  max-width: calc(100% - 4px);
   margin: 0 2px 8px;
   border: 1px solid var(--dsw-alias-border-l2, rgba(128, 128, 128, .35));
   border-radius: 12px;
