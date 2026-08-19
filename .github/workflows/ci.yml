@@ -35,6 +35,22 @@ jobs:
         working-directory: harness
         run: pnpm install --no-frozen-lockfile
 
+      - name: Exclude third-party plugin tests from the host aggregate
+        working-directory: harness
+        run: |
+          python3 - <<'EOF'
+          import io
+          p = 'tsconfig.host.json'
+          s = io.open(p, encoding='utf-8').read()
+          anchor = '  "exclude": [\n'
+          line = '    "packages/extensions/dsh-deepseek-billing/tests",\n'
+          assert anchor in s, 'tsconfig.host.json exclude anchor not found'
+          if line not in s:
+              s = s.replace(anchor, anchor + line, 1)
+          io.open(p, 'w', encoding='utf-8').write(s)
+          print('patched tsconfig.host.json exclude')
+          EOF
+
       - name: Build Harness host contracts
         working-directory: harness
         run: pnpm run build:lib:host

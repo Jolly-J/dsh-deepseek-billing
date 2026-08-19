@@ -138,6 +138,8 @@ pnpm --filter dsh-deepseek-billing verify
 
 `build:lib:host` 先生成 DSH Typert remote contracts;新 checkout 缺少这些产物时,客户端类型聚合无法解析 `/remote` 入口。随后 `verify` 会依次执行插件类型构建、官方 client bundle、价格与用量单元测试,以及发布目录和页脚布局约定检查。GitHub Actions 使用相同顺序。
 
+> 注意:上游 `tsconfig.host.json` 的测试 glob(`packages/*/*/tests/**/*.ts`)会把第三方插件的 `tests/` 拉进 host 聚合编译,导致 TS6307。手动 checkout 构建时,请把 `packages/extensions/dsh-deepseek-billing/tests` 加入该文件 `exclude` 数组;本仓库 CI 已自动注入这一步。
+
 目录职责:
 
 - `src/`:源码和可直接测试的计费模块;
