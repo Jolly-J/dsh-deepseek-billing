@@ -36,23 +36,40 @@ dsh plugin --profile web add https://github.com/Jolly-J/dsh-deepseek-billing.git
 
 > 帮我把这个插件装到我的 DSH 里:<仓库地址>
 
-你的智能体照着下面 6 步做完,重启 `dsh web` 就好了:
+智能体只需执行上面的官方 `dsh plugin add` 命令并提示你重启 `dsh web`;不需要修改 DSH 源码。
 
-1. 把本仓库放到 DSH 项目的 `packages/extensions/dsh-deepseek-billing`;
-2. 在 `packages/bundle/web-app/cordis.patch.yml` 里加一行:
-   ```yaml
-   - id: ui-deepseek-billing
-     name: 'dsh-deepseek-billing'
-   ```
-3. 在 `packages/bundle/web-app/package.json` 的 `dependencies` 里加:
-   ```json
-   "dsh-deepseek-billing": "workspace:^"
-   ```
-4. 在根目录 `tsconfig.client.json` 的 `references` 里加 `{ "path": "./packages/extensions/dsh-deepseek-billing" }`;
-5. 运行 `pnpm install`,然后构建:`pnpm --filter dsh-deepseek-billing bundle`;
-6. 重启 `dsh web`。
+### 更新
 
-> 要求:DSH 项目本身能正常构建,`pnpm` 版本 11.7.0(和 DSH 的 `packageManager` 一致)。
+```sh
+dsh plugin --profile web update dsh-deepseek-billing
+```
+
+更新后重启 `dsh web`。
+
+## 开发与维护
+
+用户安装直接使用仓库内提交的 `lib/` 产物。`src/` 是唯一源码真源,根目录不保留源码或 bundle 副本。官方 DSH 的客户端 bundle 运行在 Vite 模块图之外,因此发布产物同时包含 `lib/client.js` 和 `lib/client.js.map`。
+
+构建配置复用 DSH 官方的客户端插件预设,所以开发 checkout 必须位于 DSH monorepo 的扩展目录:
+
+```sh
+git clone https://github.com/deepseek-ai/deepseek-harness.git
+git clone https://github.com/Jolly-J/dsh-deepseek-billing.git \
+  deepseek-harness/packages/extensions/dsh-deepseek-billing
+cd deepseek-harness
+pnpm install
+pnpm --filter dsh-deepseek-billing verify
+```
+
+`verify` 会依次执行类型构建、官方 client bundle、价格与用量单元测试,以及发布目录和页脚布局约定检查。GitHub Actions 使用同一条命令。
+
+目录职责:
+
+- `src/`:源码和可直接测试的计费模块;
+- `lib/`:由 `npm run build` 生成并提交的安装产物;
+- `tests/`:价格、用量和发布产物回归测试;
+- `docs/images/`:README 与插件市场截图;
+- `cordis.patch.yml`:让 `dsh plugin add` 自动挂载本插件的组合包声明。
 
 ## 数据从哪来
 

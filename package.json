@@ -1,7 +1,7 @@
 {
   "name": "dsh-deepseek-billing",
   "description": "DSH WebUI 插件:侧边栏 DeepSeek 账户余额显示与按会话费用估算",
-  "version": "0.1.0-rc.5",
+  "version": "0.1.0-rc.6",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
@@ -34,9 +34,20 @@
     }
   },
   "scripts": {
-    "bundle": "tsdown",
-    "watch": "tsdown --watch"
+    "check:context": "node scripts/verify-build-context.mjs",
+    "typecheck": "npm run check:context && tsc -b --force",
+    "build": "npm run typecheck && tsdown",
+    "bundle": "npm run build",
+    "watch": "npm run check:context && tsdown --watch",
+    "test:unit": "node --import tsx/esm --test tests/balance.test.ts tests/format.test.ts tests/pricing.test.ts tests/usage.test.ts",
+    "test:artifacts": "node --test tests/artifacts.test.mjs",
+    "test": "npm run test:unit && npm run test:artifacts",
+    "verify": "npm run build && npm test"
   },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "packageManager": "pnpm@11.7.0",
   "license": "MIT",
   "peerDependencies": {
     "react": "^18.2.0"
@@ -50,12 +61,16 @@
     "@deepseek-ai/dsh-host-webserver": "workspace:^",
     "@deepseek-ai/dsh-invariants": "workspace:^",
     "@types/react": "~18.3.1",
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "tsdown": "^0.22.2",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
   },
   "files": [
     "lib/index.js",
     "lib/invariant.js",
     "lib/client.js",
+    "lib/client.js.map",
     "lib/types/**/*.d.ts",
     "cordis.patch.yml"
   ],

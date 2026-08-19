@@ -10,4 +10,3 @@ import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client';
 export declare const inject: string[];
 /** Mount the billing card into the official sidebar footer action area. */
 export declare function apply(ctx: ClientContext): void;
-//# sourceMappingURL=index.d.ts.map

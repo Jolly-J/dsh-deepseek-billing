@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out DeepSeek Harness
+        uses: actions/checkout@v4
+        with:
+          repository: deepseek-ai/deepseek-harness
+          path: harness
+          fetch-depth: 1
+
+      - name: Check out plugin
+        uses: actions/checkout@v4
+        with:
+          path: harness/packages/extensions/dsh-deepseek-billing
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: harness/pnpm-lock.yaml
+
+      - name: Install Harness dependencies
+        working-directory: harness
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build and test plugin
+        working-directory: harness
+        run: pnpm --filter dsh-deepseek-billing verify
+
+      - name: Verify package contents
+        working-directory: harness/packages/extensions/dsh-deepseek-billing
+        run: npm pack --dry-run
