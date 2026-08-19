@@ -21,3 +21,22 @@ if (missing.length > 0) {
   ].join('\n'))
   process.exit(1)
 }
+
+const hostContracts = [
+  'packages/interaction/commands/lib/typert.remote-client.d.ts',
+  'packages/goal/goal/lib/typert.remote-client.d.ts',
+  'packages/extensions/cordis-host-runner/lib/typert.remote-client.d.ts',
+  'packages/host/plugin-inventory/lib/typert.remote-client.d.ts',
+  'packages/feedback/message-feedback/lib/typert.remote-client.d.ts',
+].map(path => resolve(harnessRoot, path))
+const missingContracts = hostContracts.filter(path => !existsSync(path))
+if (missingContracts.length > 0) {
+  console.error([
+    'DeepSeek Harness host contracts have not been built.',
+    'Run this from the Harness root before building the plugin:',
+    '  pnpm run build:lib:host',
+    'Missing contract files:',
+    ...missingContracts.map(path => `  ${path}`),
+  ].join('\n'))
+  process.exit(1)
+}

@@ -35,6 +35,10 @@ jobs:
         working-directory: harness
         run: pnpm install --no-frozen-lockfile
 
+      - name: Build Harness host contracts
+        working-directory: harness
+        run: pnpm run build:lib:host
+
       - name: Build and test plugin
         working-directory: harness
         run: pnpm --filter dsh-deepseek-billing verify

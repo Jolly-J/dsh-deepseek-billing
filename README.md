@@ -58,10 +58,11 @@ git clone https://github.com/Jolly-J/dsh-deepseek-billing.git \
   deepseek-harness/packages/extensions/dsh-deepseek-billing
 cd deepseek-harness
 pnpm install
+pnpm run build:lib:host
 pnpm --filter dsh-deepseek-billing verify
 ```
 
-`verify` 会依次执行类型构建、官方 client bundle、价格与用量单元测试,以及发布目录和页脚布局约定检查。GitHub Actions 使用同一条命令。
+`build:lib:host` 先生成 DSH Typert remote contracts;新 checkout 缺少这些产物时,客户端类型聚合无法解析 `/remote` 入口。随后 `verify` 会依次执行插件类型构建、官方 client bundle、价格与用量单元测试,以及发布目录和页脚布局约定检查。GitHub Actions 使用相同顺序。
 
 目录职责:
 
