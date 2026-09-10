@@ -1,6 +1,7 @@
 /** Compact DeepSeek balance and session-cost card for the official sidebar footer. */
 import { useEffect, useState, type ReactNode } from 'react'
 import type { PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import { AnimatedValue } from './AnimatedValue.tsx'
 import { errorMessage, loadBillingStatus, type LoadState } from './api.ts'

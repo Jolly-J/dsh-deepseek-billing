@@ -9,10 +9,18 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
+      # Pinned on purpose. The harness is the *dependency* here, and tracking its
+      # default branch makes CI fail on every upstream rename — the 2026-09-10
+      # push broke exactly that way, when `@deepseek-ai/dsh-client-runtime` was
+      # dissolved into the renderer/session/store packages and the plugin's
+      # `workspace:^` specifier stopped resolving (ERR_PNPM_WORKSPACE_PKG_NOT_FOUND).
+      # Bump this ref deliberately, with the plugin's client imports updated in
+      # the same change.
       - name: Check out DeepSeek Harness
         uses: actions/checkout@v4
         with:
           repository: deepseek-ai/deepseek-harness
+          ref: aa8262ec091698bae9a6b04773a6b5b06ad4aef2
           path: harness
           fetch-depth: 1
 

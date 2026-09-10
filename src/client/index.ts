@@ -6,7 +6,13 @@
  * floats over the workspace region.
  */
 
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+// Type-only: the client Context comes from cordis itself since DSH 0.1.0-rc.8,
+// and each service merge is imported from the package that declares it —
+// `ctx.slots` from the renderer, `useSessions` from ui-session, and the
+// sidebar footer slot key from ui-sidebar.
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
+import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type {} from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import { BillingPanel } from './BillingPanel.tsx'
 

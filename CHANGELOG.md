@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-rc.10 - 2026-09-10
+
+- **修复安装失败**:官方已把客户端门面包 `@deepseek-ai/dsh-client-runtime` 拆掉(现在由 `dsh-client-ui-renderer` 提供 `ctx.slots`、`dsh-client-ui-session` 提供 `useSessions`),插件 `package.json` 里指向它的 `workspace:^` 依赖会让 `pnpm install` 直接报 `ERR_PNPM_WORKSPACE_PKG_NOT_FOUND`,CI 因此变红。
+- 客户端类型导入改用官方现写法:客户端上下文直接从 `@deepseek-ai/cordis` 取 `Context`,各服务合并分别从声明它的包 `import type {}`;`dsh.client.inject` 同步改为 `dsh-client-ui-renderer` / `dsh-client-ui-session` / `dsh-client-ui-sidebar`。
+- CI 的 harness checkout **钉到固定 ref**(`aa8262e`,2026-09-10),不再跟随上游默认分支漂移——上游每次改名都会打穿这套第三方插件的构建。
+
 ## 0.1.0-rc.9 - 2026-09-10
 
 - 跟进官方 **2026-09-10 12:00(北京时间)** 生效的 V4.1-Flash 新价表:Flash 空闲时段 0.02 / 1.0 / 4.0 元、高峰时段 0.04 / 2.0 / 8.0 元(命中 / 未命中输入 / 输出,每百万 token)。此前卡片一直沿用 2026-08-17 那一版价格。

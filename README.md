@@ -132,13 +132,16 @@ dsh plugin --profile web update dsh-deepseek-billing
 
 ```sh
 git clone https://github.com/deepseek-ai/deepseek-harness.git
-git clone https://github.com/Jolly-J/dsh-deepseek-billing.git \
-  deepseek-harness/packages/extensions/dsh-deepseek-billing
 cd deepseek-harness
-pnpm install
+git checkout aa8262ec091698bae9a6b04773a6b5b06ad4aef2   # CI 钉住的同一个 ref
+git clone https://github.com/Jolly-J/dsh-deepseek-billing.git \
+  packages/extensions/dsh-deepseek-billing
+pnpm install --no-frozen-lockfile
 pnpm run build:lib:host
 pnpm --filter dsh-deepseek-billing verify
 ```
+
+harness **必须按 commit 钉住**,别跟默认分支:插件的 `devDependencies` 用 `workspace:^` 指向官方包,上游一旦改名(例如 2026-09-10 把 `@deepseek-ai/dsh-client-runtime` 拆成 renderer/session/store),`pnpm install` 就会直接报 `ERR_PNPM_WORKSPACE_PKG_NOT_FOUND`。**升级这个 ref 时,要同步改 `src/client/` 里的类型导入**:客户端上下文现在从 `@deepseek-ai/cordis` 取 `Context`,`ctx.slots` 由 `@deepseek-ai/dsh-client-ui-renderer` 声明,`useSessions` 由 `@deepseek-ai/dsh-client-ui-session` 声明,`package.json` 的 `dsh.client.inject` 也要跟着对齐。
 
 `build:lib:host` 先生成 DSH Typert remote contracts;新 checkout 缺少这些产物时,客户端类型聚合无法解析 `/remote` 入口。随后 `verify` 会依次执行插件类型构建、官方 client bundle、价格与用量单元测试,以及发布目录和页脚布局约定检查。GitHub Actions 使用相同顺序。
 

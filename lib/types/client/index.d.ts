@@ -5,7 +5,7 @@
  * /billing/status route. The card stays in normal layout flow and never
  * floats over the workspace region.
  */
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client';
+import type { Context as ClientContext } from '@deepseek-ai/cordis';
 /** Required services for the sidebar-footer registration. */
 export declare const inject: string[];
 /** Mount the billing card into the official sidebar footer action area. */
