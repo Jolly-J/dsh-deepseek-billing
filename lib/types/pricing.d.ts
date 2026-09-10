@@ -3,13 +3,21 @@ interface Price {
     miss: number;
     out: number;
 }
-/** Classify a model id into the two DeepSeek V4 billing families. */
-export declare function modelKey(modelId: string): 'flash' | 'pro';
+/** Peak/off-peak split inside one tiered era. */
+type SplitTier = 'peak' | 'offPeak';
+/** Billing tier that produced a resolved price. */
+export type Tier = 'flat' | SplitTier;
+/** The two price tables DeepSeek bills model requests against. */
+export type Family = 'flash' | 'pro';
+/** Classify a model id into the price table its own name belongs to. */
+export declare function modelKey(modelId: string): Family;
+/** Resolve the family a request is actually billed as at one instant. */
+export declare function billedFamily(modelId: string, timeMs?: number): Family;
 /** Resolve the China Standard Time peak/off-peak tier for one timestamp. */
-export declare function tierAt(timeMs: number | undefined): 'peak' | 'offPeak';
+export declare function tierAt(timeMs?: number, weekdayOnly?: boolean): SplitTier;
 /** Resolve the exact input/output rates that apply to one model request. */
-export declare function priceOf(modelId: string, timeMs: number | undefined): Price & {
-    tier: 'flat' | 'peak' | 'offPeak';
+export declare function priceOf(modelId: string, timeMs?: number): Price & {
+    tier: Tier;
 };
 /** Render the compact price explanation shown in the expanded card. */
 export declare function pricingNote(modelId: string, timeMs?: number): string;

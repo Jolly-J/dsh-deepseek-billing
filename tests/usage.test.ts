@@ -30,7 +30,25 @@ void test('folds successful messages into disjoint token and cost buckets', () =
   assert.equal(result.cost.output, 0.9)
   assert.equal(result.cost.total, 2.425)
   assert.equal(result.model, 'DeepSeek-V4-Flash')
-  assert.match(result.pricingNote, /DeepSeek-V4-Flash/)
+  assert.match(result.pricingNote, /DeepSeek-V4\.1-Flash/)
+})
+
+void test('charges requests after the 2026-09-10 cut at the V4.1-Flash rates', () => {
+  const result = foldUsage([
+    {
+      type: 'assistant/message',
+      time: Date.parse('2026-09-10T05:00:00Z'), // Thursday 13:00 CST, off-peak
+      data: {
+        usage: { inputTokens: 1_000_000, cacheReadTokens: 500_000, outputTokens: 200_000 },
+        message: { source: { model: 'deepseek-flash' } },
+      },
+    },
+  ])
+
+  assert.equal(result.cost.input, 1.01)
+  assert.equal(result.cost.output, 0.8)
+  assert.equal(result.cost.total, 1.81)
+  assert.equal(result.model, 'deepseek-flash')
 })
 
 void test('ignores malformed events and clamps invalid usage to zero', () => {
