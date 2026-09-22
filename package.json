@@ -1,7 +1,7 @@
 {
   "name": "dsh-deepseek-billing",
   "description": "DSH WebUI 插件:侧边栏 DeepSeek 账户余额显示与按会话费用估算",
-  "version": "0.1.0-rc.10",
+  "version": "0.1.0-rc.11",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
@@ -40,7 +40,7 @@
     "build": "npm run typecheck && tsdown",
     "bundle": "npm run build",
     "watch": "npm run check:context && tsdown --watch",
-    "test:unit": "node --import tsx/esm --test tests/balance.test.ts tests/format.test.ts tests/pricing.test.ts tests/usage.test.ts",
+    "test:unit": "node --import tsx/esm --test tests/balance.test.ts tests/format.test.ts tests/pricing.test.ts tests/session.test.ts tests/usage.test.ts",
     "test:artifacts": "node --test tests/artifacts.test.mjs",
     "test": "npm run test:unit && npm run test:artifacts",
     "verify": "npm run build && npm test"

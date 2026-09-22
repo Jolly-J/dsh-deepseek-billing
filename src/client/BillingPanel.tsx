@@ -8,6 +8,7 @@ import { errorMessage, loadBillingStatus, type LoadState } from './api.ts'
 import { BillingDetails } from './BillingDetails.tsx'
 import { balanceShort, costShort, statusKind } from './format.ts'
 import { ChevronIcon, RefreshIcon } from './icons.tsx'
+import { selectActiveSessionId } from './session.ts'
 import css from './BillingPanel.module.css'
 
 type Props = PropsRuntime<'sidebar.footer.action'>
@@ -18,8 +19,11 @@ const REFRESH_INTERVAL_MS = 60000
 export function BillingPanel({ wide, useSessions }: Props): ReactNode {
   const [expanded, setExpanded] = useState(false)
   const [status, setStatus] = useState<LoadState | null>(null)
-  const currentSession = useSessions(state => state.current)
-  const sessionId = currentSession === undefined ? null : String(currentSession)
+  // DSH 0.1.6-alpha.2 removed `current` from the Session list snapshot: the
+  // selected Session is now the one the main view retains, the same projection
+  // the official sidebar and layout read. Without this the card kept asking the
+  // host for session-less totals and showed "—" instead of the session cost.
+  const sessionId = useSessions(selectActiveSessionId)
 
   useEffect(() => {
     if (!wide) return undefined

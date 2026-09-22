@@ -15,12 +15,14 @@ jobs:
       # dissolved into the renderer/session/store packages and the plugin's
       # `workspace:^` specifier stopped resolving (ERR_PNPM_WORKSPACE_PKG_NOT_FOUND).
       # Bump this ref deliberately, with the plugin's client imports updated in
-      # the same change.
+      # the same change. Current ref: tag dsh-v0.1.6-alpha.2 — the release the
+      # plugin now targets, where `SessionListState.current` was replaced by the
+      # `retainedBy` ownership counts (see src/client/session.ts).
       - name: Check out DeepSeek Harness
         uses: actions/checkout@v4
         with:
           repository: deepseek-ai/deepseek-harness
-          ref: aa8262ec091698bae9a6b04773a6b5b06ad4aef2
+          ref: ddefc45fbc7f8e46dd73185e68295696d1297887
           path: harness
           fetch-depth: 1
 
