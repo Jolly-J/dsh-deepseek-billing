@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-rc.11 - 2026-09-22
+
+- **修复「会话费用不显示」**:DSH 0.1.6-alpha.2 把 `current` 字段从 Session 列表快照(`SessionListState`)里删掉了,卡片还在按老写法读 `useSessions(state => state.current)`,拿到的一直是 `undefined`;于是插件每次都按「没有会话」去问宿主 `/billing/status`,余额照常显示,「会话:」一栏永远是 `—`。现在改为读主视图持有的那一行(`retainedBy.mainView > 0`),与官方侧边栏、工作区浏览器、窗口标题用的是同一个投影。
+- 会话选择规则抽成无依赖的纯函数 `src/client/session.ts#selectActiveSessionId`,并补 `tests/session.test.ts` 回归测试(被 `mainView` 持有 / 只被其它来源持有 / 空快照 / 部分填充 / 旧版 `current` 兜底);函数对两代快照都做防御性读取,老版本 DSH(还有 `current`、行上没有 `retainedBy`)不会因为这次改动在选择器里抛错。
+- CI 的 harness checkout 从 `aa8262e`(0.1.5-rc.1,2026-09-10)升到 `dsh-v0.1.6-alpha.2`(`ddefc45`,2026-09-22),与当前线上 npm 版 `@deepseek-ai/dsh` 对齐——老 ref 的 `SessionListState` 里还有 `current`,钉在旧 ref 就测不出这次的问题。
+
 ## 0.1.0-rc.10 - 2026-09-10
 
 - **修复安装失败**:官方已把客户端门面包 `@deepseek-ai/dsh-client-runtime` 拆掉(现在由 `dsh-client-ui-renderer` 提供 `ctx.slots`、`dsh-client-ui-session` 提供 `useSessions`),插件 `package.json` 里指向它的 `workspace:^` 依赖会让 `pnpm install` 直接报 `ERR_PNPM_WORKSPACE_PKG_NOT_FOUND`,CI 因此变红。

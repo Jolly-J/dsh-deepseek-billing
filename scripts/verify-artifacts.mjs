@@ -21,6 +21,9 @@ assert.equal(await exists('lib/client.js.map'), true, 'official clientBundle sou
 assert.ok(packageJson.files.includes('lib/client.js.map'), 'package files must include the client sourcemap')
 assert.match(bundle, /sidebar\.footer\.action/)
 assert.doesNotMatch(bundle, /sidebar\.header\.action/)
+// Shipped bundle must carry the 0.1.6-alpha.2 Session selection rule: the list
+// snapshot no longer exposes `current`, so a stale artifact silently shows "—".
+assert.match(bundle, /retainedBy\??\.mainView/)
 assert.match(bundle, /sourceMappingURL=client\.js\.map/)
 assert.match(stylesheet, /width:\s*calc\(100% - 4px\)/)
 assert.doesNotMatch(stylesheet.match(/\.card\s*\{[^}]+\}/s)?.[0] ?? '', /position:\s*(absolute|fixed)/)
